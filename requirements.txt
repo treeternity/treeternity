@@ -1,0 +1,6 @@
+dom-i18n
+server
+nano
+#connect-redis
+nodemon
+
