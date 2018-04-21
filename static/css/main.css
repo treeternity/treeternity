@@ -2144,7 +2144,7 @@
 
 	@-moz-keyframes reveal-header {
 		0% {
-			top: -5em;
+			top: 0em;
 		}
 
 		100% {
@@ -2154,7 +2154,7 @@
 
 	@-webkit-keyframes reveal-header {
 		0% {
-			top: -5em;
+			top: 0em;
 		}
 
 		100% {
@@ -2164,7 +2164,7 @@
 
 	@-ms-keyframes reveal-header {
 		0% {
-			top: -5em;
+			top: 0em;
 		}
 
 		100% {
@@ -2174,7 +2174,7 @@
 
 	@keyframes reveal-header {
 		0% {
-			top: -5em;
+			top: 0em;
 		}
 
 		100% {
@@ -2635,7 +2635,7 @@
 		/* Section/Article */
 
 			header br {
-				display: none;
+				display:;
 			}
 
 			header.major {
@@ -2771,8 +2771,8 @@
 
 		/* Header */
 
-			#header {
-				display: none;
+			#header h1 span {
+                display: none;
 			}
 
 		/* Banner */
@@ -3024,7 +3024,6 @@
 		/* Section/Article */
 
 			header {
-				text-align: center;
 			}
 
 				header.major {

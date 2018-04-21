@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Google Street View PoC</title>
+	<link rel='shortcut icon' href='favicon.ico' type='image/x-icon'/ >
+	<link rel="stylesheet" type="text/css" href="css/streetviewstyles.css">
+
+</head>
+<body>
+
+	<header>
+		
+		<h1>Please, type in your address and press Enter</h1>
+			
+		<input id="address" type="text" name="address">
+		
+	</header>
+
+	<div id="floating-panel">
+
+		<table style="padding-left: 15px; margin-top: 20px">
+
+			<tr>
+				<td><b>Position</b></td><td id="position-cell">&nbsp;</td>
+			</tr>
+			<tr>
+				<td><b>Latitude</b></td> <td id="lat-cell">&nbsp;</td>
+				
+			</tr>
+			<tr>
+				<td><b>Longitude</b></td> <td id="lng-cell">&nbsp;</td>
+				
+			</tr>
+			<tr>
+				<td><b>Heading:</b></td><td id="heading-cell">270</td>
+			</tr>
+			<tr>
+				<td><b>Pitch:</b></td><td id="pitch-cell">0.0</td>
+			</tr>
+			<tr style="display: none">
+				<td><b>Pano ID</b></td><td id="pano-cell">&nbsp;</td>
+			</tr>
+
+			<table id="links_table"></table>
+
+		</table>
+
+	</div>
+	
+	<div id="address-actions">
+		<input id="submit" type="button" value="Get My Address" style="display: none">
+		<input id="getImage" type="button" value="Get Street View Image URL" style="">
+	</div>
+
+	<div id="pano" style="width: 50%; height: 50%; margin-top: 20px; float: left"></div>
+	<div id="map" style="width: 50%; height: 50%; margin-top: 20px; float:left"></div>
+
+
+	<script type="text/javascript">
+
+		var map;
+		var panorama;
+		var sv;
+		var initPosition = {lat: 39.7392, lng: -104.9903};
+		var streetviewLocation;
+
+		function initMap() {
+
+		map = new google.maps.Map(document.getElementById('map'), {
+		zoom: 12,
+		center: initPosition
+		});
+
+
+
+		var geocoder = new google.maps.Geocoder();
+
+		document.getElementById('submit').addEventListener('click', function() {
+		geocodeAddress(geocoder, map);
+		});
+
+
+		sv = new google.maps.StreetViewService();
+		panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'));
+
+		addPanoramaListener(panorama);
+
+		panorama.setPosition(initPosition);
+
+		map.addListener('click', function(event) {
+		sv.getPanorama({location: event.latLng, radius: 50}, processSVData);
+		});
+
+		}
+
+		function addPanoramaListener(panoramaObject) {
+
+			panorama.addListener('pano_changed', function() {
+			   var panoCell = document.getElementById('pano-cell');
+			   panoCell.innerHTML = panorama.getPano();
+			});
+
+			panorama.addListener('links_changed', function() {
+			   var linksTable = document.getElementById('links_table');
+			   while (linksTable.hasChildNodes()) {
+			     linksTable.removeChild(linksTable.lastChild);
+			   }
+			   var links = panorama.getLinks();
+			   for (var i in links) {
+			     var row = document.createElement('tr');
+			     linksTable.appendChild(row);
+			     var labelCell = document.createElement('td');
+			     labelCell.innerHTML = '<b>Link: ' + i + '</b>';
+			     var valueCell = document.createElement('td');
+			     valueCell.innerHTML = links[i].description;
+			     linksTable.appendChild(labelCell);
+			     linksTable.appendChild(valueCell);
+			   }
+			});
+
+			panorama.addListener('position_changed', function() {
+			   var positionCell = document.getElementById('position-cell');
+			   var positionCellLatitude = document.getElementById('lat-cell');
+			   var positionCellLongitude = document.getElementById('lng-cell');
+
+			   positionCell.firstChild.nodeValue = panorama.getPosition() + '';
+			   positionCellLatitude.firstChild.nodeValue = panorama.getPosition().lat() + '';
+			   positionCellLongitude.firstChild.nodeValue = panorama.getPosition().lng() + '';
+
+			});
+
+			panorama.addListener('pov_changed', function() {
+			   var headingCell = document.getElementById('heading-cell');
+			   var pitchCell = document.getElementById('pitch-cell');
+			   headingCell.firstChild.nodeValue = panorama.getPov().heading + '';
+			   pitchCell.firstChild.nodeValue = panorama.getPov().pitch + '';
+			});
+		}
+
+		function geocodeAddress(geocoder, resultsMap) {
+
+			var address = document.getElementById('address').value;
+
+			geocoder.geocode({'address': address}, function(results, status) {
+
+			if (status === google.maps.GeocoderStatus.OK) {
+
+			  resultsMap.setCenter(results[0].geometry.location);
+			  var marker = new google.maps.Marker({
+			    map: resultsMap,
+			    position: results[0].geometry.location
+			  });
+
+			  // Set the initial Street View camera to the center of the map
+			  sv.getPanorama({location: results[0].geometry.location, radius: 50}, processSVData);
+
+			  streetviewLocation = results[0].geometry.location;
+
+			} else {
+			  alert('Geocode was not successful for the following reason: ' + status);
+			}
+
+			});
+
+		}
+
+		function processSVData(data, status) {
+
+			if (status === google.maps.StreetViewStatus.OK) {
+			var marker = new google.maps.Marker({
+			  position: data.location.latLng,
+			  map: map,
+			  title: data.location.description
+			});
+
+			panorama.setPano(data.location.pano);
+			panorama.setPov({
+			  heading: 250,
+			  pitch: 0
+			});
+			panorama.setVisible(true);
+
+			marker.addListener('click', function() {
+			  var markerPanoID = data.location.pano;
+			  // Set the Pano to use the passed panoID.
+			  panorama.setPano(markerPanoID);
+			  panorama.setPov({
+			    heading: 270,
+			    pitch: 0
+			  });
+			  panorama.setVisible(true);
+			});
+			} else {
+			console.error('Street View data not found for this location.');
+			}
+
+		}
+
+
+		document.getElementById('address').addEventListener('keyup', function (event) {
+
+
+			if (event.keyCode == 13) {
+			
+				document.getElementById('submit').click();
+			}
+
+		});
+
+
+		document.getElementById('getImage').addEventListener('click', function() {
+
+			var apiKey      = 'AIzaSyDwv3jzb9Cc4QD9pRhwgeL4pz8WX6DRpLE';
+			var coreURL     = 'https://maps.googleapis.com/maps/api/streetview?size=';
+			var latitude    = document.getElementById('lat-cell').innerHTML;
+			var longitude   = document.getElementById('lng-cell').innerHTML;
+			var location    = latitude + ',' + longitude;
+			var heading     = document.getElementById('heading-cell').innerHTML;
+			var pitch       = document.getElementById('pitch-cell').innerHTML;
+			var imageWidth  = '600';
+			var imageHeigth = '300';
+
+			window.location = 
+			coreURL + imageWidth + 'x' + imageHeigth + '&location=' + location +'&heading=' + heading + '&pitch=' + pitch + '&key=' + apiKey;
+
+		});
+
+	</script>
+
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwv3jzb9Cc4QD9pRhwgeL4pz8WX6DRpLE&signed_in=true&callback=initMap" async defer>
+	</script>
+
+	<script type="text/javascript" src="js/streetviewpoc.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: 'Roboto','sans-serif';
+    margin: 0;
+}
+
+body {
+  background-color: #a6d68e;
+}
+
+header {
+  height: auto;
+  padding: 30px 15px 30px 15px;
+  margin: 0;
+  background-color: #395c90;
+  color: #FFFFFF;
+}
+
+header h1 {
+  margin: 0;
+  width: auto;
+  float: left;
+  position: relative;
+}
+
+header input {
+  position: relative;
+  left: 20px;
+  min-width: 500px;
+  height: 28px;
+  padding: 0 5px 0 5px;
+  top: 3px;
+}
+
+table {
+  color: #FFFFFF;
+}
+
+
+input {
+  border-radius: 4px;
+}
+
+
+div.profile-photo,
+.profile-photo-light, 
+.profile-photo {
+  visibility: hidden !important;
+}
+
+#links_table {
+  display: none;
+}
+
+#map {
+    height: 100%;
+}
+
+.map-control {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 2px rgba(33, 33, 33, 0.4);
+    font-family: 'Roboto','sans-serif';
+    margin: 10px;
+    /* Hide the control initially, to prevent it from appearing
+       before the map loads. */
+    display: none;
+}
+/* Display the control once it is inside the map. */
+#map .map-control { display: block; }
+
+#address-actions {
+  margin-left: 15px;
+}
+
+#address-actions #getImage {
+  margin-top: 20px;
+  color: #FFFFFF;
+  background: #395c90;
+  height: 28px;
+}
+
+.selector-control {
+    font-size: 14px;
+    line-height: 30px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
