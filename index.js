@@ -12,6 +12,10 @@ const njk = expressNunjucks(app, {
     noCache: isDev 
 });
 
+app.get('/static/*', function(request, response) {
+     response.sendFile( __dirname + '/static/' + request.params[0]);
+});
+
 app.get('/', (req, res) => {
     res.render('index');
 });
