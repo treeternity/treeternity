@@ -13,6 +13,22 @@
 		<link rel="stylesheet" href="static/css/main.css" />
 		<!--[if lte IE 8]><link rel="stylesheet" href="static/css/ie8.css" /><![endif]-->
 		<!--[if lte IE 9]><link rel="stylesheet" href="static/css/ie9.css" /><![endif]-->
+        <style>
+            @media (max-width : 845px){
+              .address {
+                width:100% !important;
+                float:none !important;
+                margin-bottom: 15px;
+              }
+              .address_street {
+                width:100%;
+                min-width:100%;
+                float:none !important;
+                text-align: center;
+              }
+            }
+        
+        </style>
 	</head>
 	<body class="index">
 		<div id="page-wrapper">
@@ -70,19 +86,13 @@
 
                     </div>
                     
-                    <div style='float:left; width:49%;'>
-                        <div class='inner' style='padding-left: 15px; width: 87%; height: 400px' id='pano'>
-                             
-                        </div>
-                        
-                    </div>
-					<div style='float:left; width: 49%;'>
+					<div class='address' style='float:left; width: 49%;'>
                         <div class='inner'>
                             <header>
                                 <h2 style='padding-bottom: 5px;'>Plant a tree</h2>
                             </header>
                             <p>
-                                <input id="address" type="text" name="address">
+                                <input id="address" placeholder="Enter your address" type="text" name="address">
                             </p>
                             <footer>
                                 <ul class="buttons vertical">
@@ -93,6 +103,14 @@
                             </footer>
                         </div>
 					</div>
+                    
+                    <div align='center' class='address_street' style='float:left; width:49%; text-align: center;'>
+                        <div class='inner' style='padding-left: 15px; min-width:99%; height: 400px' id='pano'>
+                             
+                        </div>
+                        
+                    </div>
+                    
                     <div style='clear:both;'></div>
                     
                     <div id="pano" style="width: 50%; height: 50%; margin-top: 20px; float: left"></div>
