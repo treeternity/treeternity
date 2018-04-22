@@ -330,11 +330,11 @@ function StreetViewOverlay() {
             }
         };
       
-        SVO.$container.mousewheel(onMouseWheel);
-        SVO.$container.mousedown(onMouseDown);
-        SVO.$container.mouseup(onMouseUp);
-        SVO.$container.mousemove(onMouseMove);
-        $(window).resize(onWindowResize);
+        //SVO.$container.mousewheel(onMouseWheel);
+        //SVO.$container.mousedown(onMouseDown);
+        //SVO.$container.mouseup(onMouseUp);
+        //SVO.$container.mousemove(onMouseMove);
+        //$(window).resize(onWindowResize);
         $(document).on("keyup", onKeyUp);
         
     };
