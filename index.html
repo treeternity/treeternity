@@ -56,19 +56,15 @@
 						appropriate (<br />).
 					-->
                     <div id="floating-panel" style='display:none;'>
-
                         <table style="padding-left: 15px; margin-top: 20px">
-
                             <tr>
                                 <td><b>Position</b></td><td id="position-cell">&nbsp;</td>
                             </tr>
                             <tr>
                                 <td><b>Latitude</b></td> <td id="lat-cell">&nbsp;</td>
-
                             </tr>
                             <tr>
                                 <td><b>Longitude</b></td> <td id="lng-cell">&nbsp;</td>
-
                             </tr>
                             <tr>
                                 <td><b>Heading:</b></td><td id="heading-cell">270</td>
@@ -79,11 +75,8 @@
                             <tr style="display: none">
                                 <td><b>Pano ID</b></td><td id="pano-cell">&nbsp;</td>
                             </tr>
-
                             <table id="links_table"></table>
-
                         </table>
-
                     </div>
                     
 					<div class='address' style='float:left; width: 49%;'>
@@ -109,6 +102,8 @@
                              
                         </div>
                         
+                        <div id='3d' style="position: absolute; top:0; bottom:20px; left: 0; right: 0; z-index: 5000;"></div>
+                        
                     </div>
                     
                     <div style='clear:both;'></div>
@@ -119,6 +114,22 @@
 
 
 		</div>
+        
+        <footer id="footer">
+
+            <ul class="icons">                
+                <li><a href="https://github.com/treeternity/treeternity/blob/master/static/3d/attribution.txt" class="icon circle fa-github"><span class="label">Attribution</span></a></li>
+            </ul>
+
+            <ul class="copyright">
+                <li>&copy; Tree.to</li><li>Design: <a href="http://html5up.net">HTML5 UP</a>. </li>
+            </ul>
+
+            <ul class="copyright">
+                <li><p>Plant a little love in every place by a few volunteers with abundant love. Peace and love :)</p></li>
+            </ul>
+
+        </footer>
 
 		<!-- Scripts -->
 			<script src="static/js/jquery.min.js"></script>
@@ -287,7 +298,7 @@
             });
 
 
-            document.getElementById('getImage').addEventListener('click', function() {
+            document.getElementById('address').addEventListener('click', function() { 
 
                 var apiKey      = 'AIzaSyDwv3jzb9Cc4QD9pRhwgeL4pz8WX6DRpLE';
                 var coreURL     = 'https://maps.googleapis.com/maps/api/streetview?size=';
@@ -310,6 +321,93 @@
         </script>
 
         <script type="text/javascript" src="static/js/streetviewpoc.js"></script>
+        
+        
+        <!-- 3ds -->
+        
+        <script src="/static/js/jquery.mousewheel.js"></script>
+        <script src="/static/js/three.min.js"></script>	
+        <script src="/static/js/TDSLoader.js"></script>
+        <script src="/static/js/Detector.js"></script>		
+        <script src="/static/js/streetviewoverlay.js"></script>
+
+        <script>
+
+
+            // Translates degrees to meters. It is just a hack, not a proper projection.
+            // originLat and originLon should be the "center" of our area of interest or
+            // close to it    
+            function hackMapProjection(lat, lon, originLat, originLon) {
+                var lonCorrection = 1.5;
+                var rMajor = 6378137.0;
+
+                function lonToX(lon) {
+                    return rMajor * (lon * Math.PI / 180);
+                }
+
+                function latToY(lat) {
+                    if (lat === 0) {
+                        return 0;
+                    } else {
+                        return rMajor * Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI / 180) / 2));
+                    }
+                }
+
+                var x = lonToX(lon - originLon) / lonCorrection;            
+                var y = latToY(lat - originLat);            
+                return {'x': x, 'y': y};
+            }
+
+
+            function latLon2ThreeMeters(lat, lon, worldOrigin) {            
+                var xy = hackMapProjection(lat, lon, worldOrigin[0], worldOrigin[1]);                     
+                return {'x': xy.x, 'y': 0, 'z': -xy.y};
+            }
+
+
+
+            function loadWheel ( object ) {
+                object.receiveShadow = true; 
+
+                var bbox = new THREE.Box3().setFromObject(object);
+
+                var xsize = bbox.max.x - bbox.min.x;
+                var ysize = bbox.max.y - bbox.min.y;
+                var zsize = bbox.max.z - bbox.min.z;				
+
+                // Sizes in meters
+                var desiredXSize = 8.0;
+                var desiredYSize = 20.0; 
+                var desiredZSize = 20.0; 
+
+                object.scale.set(desiredXSize / xsize, desiredYSize / ysize, desiredZSize / zsize);								
+
+                object.position.set(meshPos.x, meshPos.y, meshPos.z); // the parking lot is sligthly under the street level			
+
+                object.rotation.set(-Math.PI/2, 0, Math.PI/2);						
+
+                // For shadows (given the right ligths, and that renderer enables them)
+                object.castShadow = true;		    
+
+                var streetViewOverlay = StreetViewOverlay();
+                // 41.684196,-0.888992 is a street close to the parking lot behind Ada Byron building
+                streetViewOverlay.load({streetView: true, objects3D: true, webGL:true}, object, 41.684196, -0.888992, worldOrigin);     
+            }
+
+            // On the parking lot behind Ada Byron building	
+            var objectPosition = [41.684561,-0.888864];
+            var worldOrigin = [41.684561,-0.888864];
+            var meshPos =  {'x': 0, 'y': -2, 'z': 0}; // We take the position of the 3d object as the center of the world, so its position will be 0,-2,0
+
+            var loader = new THREE.TDSLoader( );
+            loader.setPath( 'static/3d/' );
+            loader.load( 'static/3d/TreeN271216.3ds', loadWheel );
+
+
+        </script>
+        
+        
+        
 
 	</body>
 </html>
